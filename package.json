@@ -7,14 +7,32 @@
     "check": "node scripts/check-syntax.cjs",
     "metrics:capture": "node scripts/capture-github-metrics.mjs",
     "package:release": "node scripts/build-release.cjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.cjs tests/*.test.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "^10.7.9",
     "web-push": "^3.6.7"
   },
-  "author": "Ellivien",
+  "author": {
+    "name": "Ellivien",
+    "url": "https://github.com/ellivien"
+  },
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ellivien/ellivien-pulsetap.git"
+  },
+  "homepage": "https://github.com/ellivien/ellivien-pulsetap#readme",
+  "bugs": {
+    "url": "https://github.com/ellivien/ellivien-pulsetap/issues"
+  },
+  "keywords": [
+    "ai",
+    "companion",
+    "notifications",
+    "web-push",
+    "netlify"
+  ],
   "engines": {
     "node": ">=18"
   }

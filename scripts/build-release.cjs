@@ -22,6 +22,7 @@ const included = [
   '.env.example',
   'CONTRIBUTING.md',
   'LICENSE',
+  'NOTICE',
   'README.md',
   'SECURITY.md',
   'assets',
@@ -29,8 +30,11 @@ const included = [
   'netlify',
   'netlify-toml-snippet.toml',
   'package.json',
+  'package-lock.json',
   'pulsetap-index-integration.md',
+  'scripts',
   'service-worker-pulsetap-snippet.js',
+  'tests',
 ];
 
 mkdirSync(releaseDirectory, { recursive: true });

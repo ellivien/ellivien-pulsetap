@@ -38,7 +38,6 @@ exports.handler = async (event) => {
     summary: String(body.summary || '').slice(0, 200),
     messages,
     savedAt: Date.now(),
-    portalActiveUntil: Number(body.portalActiveUntil || 0) || null,
     lastChatActivityAt: Number(body.lastChatActivityAt || 0) || null,
     recentChatWindowMs: Math.max(0, Math.min(30 * 60 * 1000, Number(body.recentChatWindowMs || 0))) || null
   };

@@ -1,7 +1,13 @@
 const crypto = require('crypto');
 const fs = require('fs');
-const webpush = require('web-push');
-const { connectLambda, getStore } = require('@netlify/blobs');
+
+function loadWebPush() {
+  return require('web-push');
+}
+
+function loadBlobSdk() {
+  return require('@netlify/blobs');
+}
 
 const STORE_NAME = 'pulsetap';
 const SUBSCRIPTION_KEY = 'primary-subscription';
@@ -44,20 +50,10 @@ function verifySessionToken(token, secret) {
   }
 }
 
-function isLocalDevRequest(event, token) {
-  const host = event.headers?.host || event.headers?.Host || '';
-  return token === 'local-dev-bypass' && (
-    host.startsWith('localhost:') ||
-    host.startsWith('127.0.0.1:') ||
-    host.startsWith('[::1]:')
-  );
-}
-
 function isAuthorisedPortalRequest(event) {
   const authHeader = event.headers?.authorization || event.headers?.Authorization || '';
   const suppliedToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-  if (isLocalDevRequest(event, suppliedToken)) return true;
-  const sessionSecret = process.env.AUTH_SESSION_SECRET || process.env.AUTH_PASSWORD_HASH;
+  const sessionSecret = process.env.AUTH_SESSION_SECRET;
   return verifySessionToken(suppliedToken, sessionSecret);
 }
 
@@ -97,8 +93,9 @@ function isLocalBlobFallback(event) {
 }
 
 function getPulseTapStore(event) {
+  if (isLocalBlobFallback(event)) return getLocalPulseTapStore();
+  const { connectLambda, getStore } = loadBlobSdk();
   if (event?.blobs) connectLambda(event);
-  else if (isLocalBlobFallback(event)) return getLocalPulseTapStore();
   return getStore(STORE_NAME);
 }
 
@@ -106,10 +103,35 @@ function validateSubscription(subscription) {
   return Boolean(
     subscription &&
     typeof subscription.endpoint === 'string' &&
-    subscription.endpoint.startsWith('https://') &&
+    isAllowedPushEndpoint(subscription.endpoint) &&
     subscription.keys &&
     typeof subscription.keys.p256dh === 'string' &&
     typeof subscription.keys.auth === 'string'
+  );
+}
+
+function isAllowedPushEndpoint(endpoint) {
+  let hostname;
+  try {
+    const url = new URL(String(endpoint || ''));
+    if (url.protocol !== 'https:') return false;
+    hostname = url.hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  const defaults = [
+    'android.googleapis.com',
+    'fcm.googleapis.com',
+    'updates.push.services.mozilla.com',
+    'notify.windows.com',
+    'web.push.apple.com'
+  ];
+  const configured = String(process.env.PULSETAP_PUSH_HOSTS || '')
+    .split(',')
+    .map(value => value.trim().toLowerCase())
+    .filter(Boolean);
+  return [...defaults, ...configured].some(allowed =>
+    hostname === allowed || hostname.endsWith(`.${allowed}`)
   );
 }
 
@@ -178,11 +200,13 @@ function configureWebPush() {
   const privateKey = String(process.env.PULSETAP_VAPID_PRIVATE_KEY || '').trim();
   const subject = String(process.env.PULSETAP_VAPID_SUBJECT || 'mailto:hello@example.com').trim();
   if (!publicKey || !privateKey) throw new Error('PulseTap VAPID keys are not configured');
+  const webpush = loadWebPush();
   webpush.setVapidDetails(subject, publicKey, privateKey);
+  return webpush;
 }
 
 async function sendPulseTapNotification(subscription, payload) {
-  configureWebPush();
+  const webpush = configureWebPush();
   const notification = {
     title: String(payload.title || 'PulseTap').slice(0, 80),
     body: String(payload.body || '').slice(0, 240),
@@ -210,10 +234,12 @@ module.exports = {
   getPulseTapStore,
   getPulseTapSubscriptions,
   getVapidPublicKey,
+  isAllowedPushEndpoint,
   isAuthorisedPortalRequest,
   jsonResponse,
   savePulseTapSubscription,
   sendPulseTapNotification,
-  validateSubscription
+  validateSubscription,
+  verifySessionToken
 };
 

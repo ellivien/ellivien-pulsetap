@@ -33,16 +33,19 @@ const PULSETAP_ENDPOINTS = {
 
 ## Auth header
 
-Use the portal's existing session token. In Ellivien-style portals this is usually the same token used for authenticated Netlify Function calls.
+Use the portal's existing authenticated session contract. The function below is
+a placeholder and must be adapted to the host portal's real session lookup.
 
 ```js
 function getPulseTapAuthHeaders() {
-  const token = localStorage.getItem('ellivien-session-token');
+  const token = getExistingPortalSessionToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 ```
 
-If the portal stores auth differently, change only this helper.
+The supplied server verifier expects a signed token with an `ellivien-portal`
+scope as one reference pattern. Adapt both sides to the target portal's existing
+authentication. Never add a public bypass token.
 
 ## Utilities
 
@@ -177,12 +180,11 @@ The included functions keep the companion's latest decision and inbox tap even w
 
 Call this after messages are saved or after a thread changes. Keep it small. PulseTap only needs enough context for a grounded reach/no-reach decision.
 
-The current version also sends lightweight activity fields. These let the scheduled function skip PulseTap while the user and companion are already together in the portal, and for a short pause window after recent chat activity.
+The current version sends a timestamp for real chat activity. This lets the scheduled function pause for a short window after recent conversation. Merely opening, focusing or tapping the portal must not reset that window.
 
 Keep message timestamps in this snapshot. The scheduled function turns them into local times and ages before asking the companion to decide, so stale present-tense wording such as "just went to sleep" is not mistaken for the user's current state hours later.
 
 ```js
-const PULSETAP_ACTIVE_WINDOW_MS = 2 * 60 * 1000;
 const PULSETAP_RECENT_CHAT_WINDOW_MS = 5 * 60 * 1000;
 const PULSETAP_CONTEXT_MESSAGES = 10;
 let lastPulseTapChatActivityAt = 0;
@@ -203,7 +205,7 @@ function getRecentPulseTapMessages() {
     .map(message => ({
       role: message.role,
       content: message.content,
-      timestamp: message.timestamp || message.createdAt || Date.now()
+      timestamp: message.timestamp || message.createdAt || null
     }));
 }
 
@@ -220,8 +222,7 @@ async function queuePulseTapContextSync() {
         threadId: getCurrentThreadId(),
         summary: getPulseTapSummary(),
         messages: getRecentPulseTapMessages(),
-        portalActiveUntil: now + PULSETAP_ACTIVE_WINDOW_MS,
-        lastChatActivityAt: lastPulseTapChatActivityAt || now,
+        lastChatActivityAt: lastPulseTapChatActivityAt || null,
         recentChatWindowMs: PULSETAP_RECENT_CHAT_WINDOW_MS
       })
     });

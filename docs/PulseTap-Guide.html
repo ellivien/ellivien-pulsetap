@@ -208,7 +208,7 @@
     <section class="card">
       <h2>How It Works</h2>
       <p>The browser saves a small recent-context snapshot. A scheduled server function checks the user's PulseTap settings, asks the companion whether to reach, saves the message to an inbox, and sends a Web Push notification if the answer is yes.</p>
-      <p>The current version also records the last decision and reason, pauses checks while the portal is actively being used, and pauses again for a short window after recent chat activity so PulseTap does not interrupt an active conversation.</p>
+      <p>The current version also records the last decision and reason, then pauses for a short window after real chat activity so PulseTap does not interrupt an active conversation. Merely opening or focusing the portal does not create chat activity.</p>
       <p>The scheduled decision receives current local time, timezone, recent-context age, last chat activity age, and per-message timestamps/ages. That helps the companion tell old wording like "just went to sleep" from the user's actual present state.</p>
     </section>
 
@@ -237,7 +237,7 @@
         </div>
         <div class="field blue">
           <span class="pill">No interrupt</span>
-          <p>The browser can tell the scheduled function when the portal is active or when chat happened recently, so the companion does not PulseTap while already in conversation.</p>
+          <p>The browser records when real chat happened recently, so the companion does not PulseTap while already in conversation.</p>
         </div>
         <div class="field amber">
           <span class="pill">Thread marker</span>
@@ -270,9 +270,9 @@
       <div class="card">
         <ul>
           <li><span class="inline">README-FOR-AI.md</span> explains the implementation contract for an AI coding assistant.</li>
-          <li><span class="inline">Implementation files/pulsetap-index-integration.md</span> gives the browser-side code and integration points.</li>
-          <li><span class="inline">Implementation files/service-worker-pulsetap-snippet.js</span> contains push and notification click handlers.</li>
-          <li><span class="inline">Implementation files/netlify/functions/</span> contains the Netlify Functions.</li>
+          <li><span class="inline">../pulsetap-index-integration.md</span> gives the browser-side code and integration points.</li>
+          <li><span class="inline">../service-worker-pulsetap-snippet.js</span> contains push and notification click handlers.</li>
+          <li><span class="inline">../netlify/functions/</span> contains the Netlify Functions.</li>
         </ul>
       </div>
     </section>
@@ -281,14 +281,16 @@
       <h2>Environment Variables</h2>
       <div class="card">
         <p>Required:</p>
-        <pre><code>PULSETAP_VAPID_PUBLIC_KEY
+        <pre><code>AUTH_SESSION_SECRET
+PULSETAP_VAPID_PUBLIC_KEY
 PULSETAP_VAPID_PRIVATE_KEY
 PULSETAP_VAPID_SUBJECT
-PULSETAP_API_KEY</code></pre>
+PULSETAP_API_KEY
+PULSETAP_MODEL</code></pre>
         <p>Optional:</p>
         <pre><code>PULSETAP_COMPANION_NAME
-PULSETAP_MODEL
-PULSETAP_BASE_PROMPT</code></pre>
+PULSETAP_BASE_PROMPT
+PULSETAP_PUSH_HOSTS</code></pre>
         <p><span class="inline">PULSETAP_API_KEY</span> is the key used by the scheduled reach decision function.</p>
         <p>Generate VAPID keys with:</p>
         <pre><code>npx web-push generate-vapid-keys</code></pre>
@@ -300,13 +302,13 @@ PULSETAP_BASE_PROMPT</code></pre>
       <div class="card">
         <ol>
           <li>Copy the Netlify Functions into <span class="inline">netlify/functions/</span>.</li>
-          <li>Install dependencies: <span class="inline">npm install @netlify/blobs web-push</span>.</li>
+          <li>Install the locked dependencies: <span class="inline">npm ci</span>.</li>
           <li>Add the environment variables.</li>
           <li>Add the schedule to <span class="inline">netlify.toml</span>.</li>
           <li>Merge the service worker snippet into the existing service worker.</li>
-          <li>Add the browser integration from <span class="inline">pulsetap-index-integration.md</span>.</li>
+          <li>Add the browser integration from <span class="inline">../pulsetap-index-integration.md</span>.</li>
           <li>Add a PulseTap button or menu item that opens the settings/inbox modal.</li>
-          <li>If adding the current no-interrupt behaviour, include the portal-activity fields in the recent-context sync.</li>
+          <li>Include the real-chat timestamp and pause-window fields in the recent-context sync.</li>
           <li>Deploy, install the portal as a PWA on the target device, enable notifications, and send a test PulseTap.</li>
         </ol>
       </div>
@@ -346,7 +348,7 @@ PULSETAP_BASE_PROMPT</code></pre>
           <li>Check that quiet hours stop scheduled sends, including half-past boundaries such as 22:30.</li>
           <li>Check that max-per-day and minimum-gap settings are respected.</li>
           <li>Confirm the status panel shows the last ask, last decision/reason, next ask, sent-today count, and last sent time.</li>
-          <li>Confirm PulseTap does not send while the portal is actively open or within the recent-chat pause window.</li>
+          <li>Confirm PulseTap does not send within the recent-chat pause window and that merely opening the portal does not reset that window.</li>
           <li>Confirm the companion can distinguish stale context from current state, for example treating last night's "going to sleep" message as old context during a morning check.</li>
           <li>Confirm notification clicks reopen the portal and show the PulseTap inbox.</li>
           <li>Confirm a rejected push does not erase the companion's latest decision or saved inbox tap, and that a later successful test clears the old delivery error.</li>
@@ -363,7 +365,7 @@ PULSETAP_BASE_PROMPT</code></pre>
 
     <footer class="ellivien-standard-footer">
       <p><strong>&copy; 2026 Ellivien</strong> &middot; <a href="https://ellivien.blogspot.com">ellivien.blogspot.com</a></p>
-      <p>Please do not redistribute this file. Share the blog link instead.</p>
+      <p>Distributed with Ellivien PulseTap under the repository's Apache License 2.0.</p>
       <p class="ellivien-footer-note">Model-agnostic companion toolkit. Users are responsible for choosing providers and following provider terms, policies and local law. This toolkit is not designed to bypass provider safeguards or rules.</p>
     </footer>
   </main>

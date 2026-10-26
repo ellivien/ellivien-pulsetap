@@ -13,6 +13,11 @@ The scheduled workflow records:
 - stars and forks;
 - every versioned release asset and its cumulative download count.
 
+Each snapshot keeps both the per-asset counts and a
+`releasePackageDownloadTotal` that sums only named `.zip` packages. The separate
+`releaseAssetDownloadTotal` includes checksum-file downloads and must not be
+described as package downloads.
+
 GitHub exposes repository traffic for only the latest 14 days. The workflow
 runs every Monday and Thursday so its overlapping snapshots preserve that
 otherwise temporary history. The JSON files contain aggregate counts only and

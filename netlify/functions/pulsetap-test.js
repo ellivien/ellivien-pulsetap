@@ -10,13 +10,8 @@ const {
 
 function getPushFailureDetails(error) {
   const statusCode = Number(error?.statusCode || 0);
-  const responseBody = String(error?.body || '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 180);
-  const parts = [String(error?.message || 'Test PulseTap failed')];
+  const parts = ['Test PulseTap failed'];
   if (statusCode) parts.push(`HTTP ${statusCode}`);
-  if (responseBody && responseBody !== parts[0]) parts.push(responseBody);
   return {
     statusCode,
     message: parts.join(' - '),

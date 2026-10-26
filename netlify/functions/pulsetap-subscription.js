@@ -30,10 +30,10 @@ function sanitizeHalfHour(value, fallback) {
   return Math.round(clamped * 2) / 2;
 }
 
-function positiveInteger(value, fallback) {
+function positiveInteger(value, fallback, maximum = 12) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
-  return Math.max(1, Math.round(parsed));
+  return Math.max(1, Math.min(maximum, Math.round(parsed)));
 }
 
 function sanitizeSettings(input = {}) {

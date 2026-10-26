@@ -59,26 +59,30 @@ For iPhone/iPad Web Push, the portal must be installed to the Home Screen as a P
 - `relationship-mode-examples.md` — optional starting prompts for different chosen relationship and message styles
 - `../assets/pulsetap-brand.png` — full-resolution optional PulseTap roundel
 - `../assets/pulsetap-icon-512.png` — notification-ready optional PulseTap icon
-- `Implementation files/pulsetap-index-integration.md` — browser-side integration notes and code
-- `Implementation files/service-worker-pulsetap-snippet.js` — service worker push/click handlers
-- `Implementation files/netlify-toml-snippet.toml` — scheduled function snippet
-- `Implementation files/netlify/functions/pulsetap-common.cjs`
-- `Implementation files/netlify/functions/pulsetap-config.js`
-- `Implementation files/netlify/functions/pulsetap-subscription.js`
-- `Implementation files/netlify/functions/pulsetap-context.js`
-- `Implementation files/netlify/functions/pulsetap-inbox.js`
-- `Implementation files/netlify/functions/pulsetap-state.js`
-- `Implementation files/netlify/functions/pulsetap-test.js`
-- `Implementation files/netlify/functions/pulsetap-scheduled.js`
+- `../pulsetap-index-integration.md` — browser-side integration notes and code
+- `../service-worker-pulsetap-snippet.js` — service worker push/click handlers
+- `../netlify-toml-snippet.toml` — scheduled function snippet
+- `../netlify/functions/pulsetap-common.cjs`
+- `../netlify/functions/pulsetap-config.js`
+- `../netlify/functions/pulsetap-subscription.js`
+- `../netlify/functions/pulsetap-context.js`
+- `../netlify/functions/pulsetap-inbox.js`
+- `../netlify/functions/pulsetap-state.js`
+- `../netlify/functions/pulsetap-test.js`
+- `../netlify/functions/pulsetap-scheduled.js`
 
 ## Environment variables
 
 Required:
 
+- `AUTH_SESSION_SECRET` when using the supplied signed-session verifier; if the
+  portal already has a different authentication contract, adapt the verifier
+  rather than adding a second session system
 - `PULSETAP_VAPID_PUBLIC_KEY`
 - `PULSETAP_VAPID_PRIVATE_KEY`
 - `PULSETAP_VAPID_SUBJECT`
 - `PULSETAP_API_KEY`
+- `PULSETAP_MODEL`
 
 Generate VAPID keys with:
 
@@ -89,8 +93,9 @@ npx web-push generate-vapid-keys
 Recommended:
 
 - `PULSETAP_COMPANION_NAME`
-- `PULSETAP_MODEL`
 - `PULSETAP_BASE_PROMPT`
+- `PULSETAP_PUSH_HOSTS` only when a legitimate browser push service is not in
+  the built-in allowlist; use hostnames only, never arbitrary URLs
 
 Use `relationship-mode-examples.md` as an optional starting point for
 `PULSETAP_BASE_PROMPT`. The user may select one example, combine compatible
@@ -99,8 +104,10 @@ relationship details to the repository.
 
 Auth:
 
-- The included helper accepts the same `Authorization: Bearer <session-token>` pattern used by other Ellivien portal guides.
-- If the target portal has different auth, adapt `isAuthorisedPortalRequest()` in `pulsetap-common.cjs`.
+- The included verifier is an example for a signed `Authorization: Bearer
+  <session-token>` contract with an `ellivien-portal` scope.
+- Adapt `isAuthorisedPortalRequest()` to the target portal's actual authenticated
+  session contract. Do not weaken or bypass the portal's existing authentication.
 
 ## Netlify schedule
 
@@ -111,12 +118,17 @@ Add this to `netlify.toml`:
   schedule = "*/30 * * * *"
 ```
 
+Netlify documents that a deployed Scheduled Function cannot be invoked directly
+by URL. The supplied handler also requires the scheduler's valid `next_run` JSON
+payload and does not accept an ordinary portal session as a substitute. Preserve
+the Scheduled Function configuration when adapting or deploying it.
+
 ## Implementation rules
 
 - Keep PulseTap opt-in.
 - Treat every example relationship mode as optional user-controlled configuration, never as permission to invent intimacy or authority.
 - Respect quiet hours, including half-hour boundaries such as `22.5` for 22:30.
-- Respect maximum reaches per day. The included backend accepts any positive whole number.
+- Respect maximum reaches per day. The included backend accepts whole numbers from 1 to 12.
 - Respect minimum gap between sent PulseTaps. The included backend accepts `1` to `24` hours.
 - Treat the schedule, maximum reaches and minimum gap as opportunity bounds, not obligations. Preserve silence/no as a valid companion decision at every check.
 - Keep push notifications short.
@@ -141,9 +153,9 @@ Add this to `netlify.toml`:
 
 1. Generate VAPID keys.
 2. Add environment variables.
-3. Install dependencies.
+3. Install the locked dependencies with `npm ci`.
 4. Register or update the service worker.
-5. Add the browser integration from `pulsetap-index-integration.md`.
+5. Add the browser integration from `../pulsetap-index-integration.md`.
 6. Deploy.
 7. Open the portal as a PWA on the target device.
 8. Enable notifications.
@@ -152,7 +164,8 @@ Add this to `netlify.toml`:
 11. Confirm quiet hours, including half-past boundaries, are respected.
 12. Confirm daily limits and minimum-gap settings are respected.
 13. Confirm the modal/status panel shows last ask, last decision/reason, next ask, sent-today count and last sent time.
-14. Confirm PulseTap stays silent while the portal is actively open and during the recent-chat pause window.
+14. Confirm PulseTap stays silent during the recent-chat pause window. Merely
+    opening or focusing the portal must not manufacture chat activity.
 15. Confirm a saved PulseTap can be added to the matching thread once, with duplicate protection and a visible PulseTap marker if the portal supports one.
 16. If upgrading an existing portal, confirm any older thread message beginning with `PulseTap from <companion name>:` also renders with the PulseTap visual marker.
 17. Simulate or observe a failed push and confirm the new tap and latest decision remain saved; then send a successful test and confirm the old error clears.

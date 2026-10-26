@@ -59,7 +59,7 @@ individual installation or ongoing technical support for the public repository.
 3. Choose or adapt an example from `docs/relationship-mode-examples.md`.
 4. Copy `.env.example` to your deployment environment and replace every
    placeholder. Never commit the real values.
-5. Install the two runtime dependencies with `npm install`.
+5. Install the locked runtime dependencies with `npm ci`.
 6. Merge the browser and service-worker examples into the host portal rather
    than replacing its existing authentication or application shell.
 7. Copy `assets/pulsetap-icon-512.png` into the host portal's public assets or
@@ -93,9 +93,10 @@ service-worker-pulsetap-snippet.js
 
 ## Project status
 
-PulseTap is extracted from a working Ellivien implementation and is being
-prepared for its first public release. Automated behavioural tests and
-additional provider adapters are planned.
+PulseTap is extracted from a working Ellivien implementation and prepared as a
+self-supported Netlify reference. Its syntax, bounded decision rules and release
+tooling are tested locally; adopters must still test their own authentication,
+provider, deployment and target devices before using it in production.
 
 ## Releases and transparent usage evidence
 
@@ -121,4 +122,7 @@ roundel may be used unmodified as the notification icon for a PulseTap
 implementation. It may be replaced with the adopter's own icon. This limited
 permission does not grant permission to use the Ellivien name or other Ellivien
 branding for unrelated products or imply endorsement by Ellivien.
+
+Created by [Ellivien](https://github.com/ellivien). The canonical repository is
+[ellivien/ellivien-pulsetap](https://github.com/ellivien/ellivien-pulsetap).
 

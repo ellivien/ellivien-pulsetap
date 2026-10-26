@@ -8,7 +8,6 @@ const {
   deletePulseTapSubscription,
   getPulseTapStore,
   getPulseTapSubscriptions,
-  isAuthorisedPortalRequest,
   jsonResponse,
   sendPulseTapNotification
 } = require('./pulsetap-common.cjs');
@@ -28,10 +27,10 @@ function clampNumber(value, fallback, min, max) {
   return Math.max(min, Math.min(max, number));
 }
 
-function positiveInteger(value, fallback) {
+function positiveInteger(value, fallback, maximum = 12) {
   const number = Number(value);
   if (!Number.isFinite(number)) return fallback;
-  return Math.max(1, Math.round(number));
+  return Math.max(1, Math.min(maximum, Math.round(number)));
 }
 
 function normalizeSettings(value = {}) {
@@ -45,7 +44,7 @@ function normalizeSettings(value = {}) {
   };
 }
 
-function getLocalParts(timezone) {
+function getLocalParts(timezone, date = new Date()) {
   const formatter = new Intl.DateTimeFormat('en-GB', {
     timeZone: timezone,
     year: 'numeric',
@@ -55,7 +54,7 @@ function getLocalParts(timezone) {
     minute: '2-digit',
     hour12: false
   });
-  const now = new Date();
+  const now = date;
   const parts = formatter.formatToParts(now);
 
   const pick = type => parts.find(part => part.type === type)?.value || '';
@@ -95,8 +94,8 @@ function formatDuration(ms) {
   return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-function isQuietHour(settings) {
-  const { hour } = getLocalParts(settings.timezone);
+function isQuietHour(settings, date) {
+  const { hour } = getLocalParts(settings.timezone, date);
   if (!Number.isFinite(hour)) return false;
   if (settings.quietHoursStart === settings.quietHoursEnd) return false;
   if (settings.quietHoursStart < settings.quietHoursEnd) {
@@ -139,7 +138,6 @@ function normalizeContext(value) {
   const savedAt = Number(value.savedAt || 0);
   const ageMs = now - savedAt;
   if (!savedAt || ageMs > 36 * 60 * 60 * 1000) return null;
-  const portalActiveUntil = Number(value.portalActiveUntil || 0) || null;
   const lastChatActivityAt = Number(value.lastChatActivityAt || 0) || null;
   const recentChatWindowMs = clampNumber(value.recentChatWindowMs, 5 * 60 * 1000, 0, 30 * 60 * 1000);
 
@@ -159,7 +157,6 @@ function normalizeContext(value) {
     summary: value.summary ? String(value.summary).slice(0, 600) : '',
     messages,
     savedAt,
-    portalActiveUntil,
     lastChatActivityAt,
     recentChatWindowMs,
     contextAgeMs: ageMs,
@@ -213,7 +210,8 @@ async function askCompanionWhetherToReach(context, dailyContext) {
   if (!apiKey) throw new Error('Missing PULSETAP_API_KEY');
 
   const companionName = process.env.PULSETAP_COMPANION_NAME || 'your companion';
-  const model = process.env.PULSETAP_MODEL || 'gpt-4.1-mini';
+  const model = String(process.env.PULSETAP_MODEL || '').trim();
+  if (!model) throw new Error('Missing PULSETAP_MODEL');
   const basePrompt = String(process.env.PULSETAP_BASE_PROMPT || '').trim();
 
   const system = [
@@ -253,8 +251,7 @@ async function askCompanionWhetherToReach(context, dailyContext) {
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`PulseTap model call failed: ${response.status} ${text.slice(0, 180)}`);
+    throw new Error(`PulseTap model call failed with HTTP ${response.status}`);
   }
 
   const data = await response.json();
@@ -267,9 +264,13 @@ async function askCompanionWhetherToReach(context, dailyContext) {
   };
 }
 
-function isScheduledOrAuthorised(event) {
-  const eventName = event.headers?.['x-netlify-event'] || event.headers?.['X-Netlify-Event'] || '';
-  return eventName === 'schedule' || isAuthorisedPortalRequest(event);
+function isScheduledInvocation(event) {
+  try {
+    const body = JSON.parse(event.body || '{}');
+    return typeof body.next_run === 'string' && Number.isFinite(Date.parse(body.next_run));
+  } catch {
+    return false;
+  }
 }
 
 async function saveSkipDecision(store, state, dayKey, sentToday, now, reason, skipped) {
@@ -288,13 +289,8 @@ async function saveSkipDecision(store, state, dayKey, sentToday, now, reason, sk
 
 function getPushFailureDetails(error) {
   const statusCode = Number(error?.statusCode || 0);
-  const responseBody = String(error?.body || '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 180);
-  const parts = [String(error?.message || 'PulseTap notification failed')];
+  const parts = ['PulseTap notification failed'];
   if (statusCode) parts.push(`HTTP ${statusCode}`);
-  if (responseBody && responseBody !== parts[0]) parts.push(responseBody);
   return {
     statusCode,
     message: parts.join(' - '),
@@ -303,7 +299,7 @@ function getPushFailureDetails(error) {
 }
 
 exports.handler = async (event) => {
-  if (!isScheduledOrAuthorised(event)) return jsonResponse(401, { error: 'Unauthorized' });
+  if (!isScheduledInvocation(event)) return jsonResponse(401, { error: 'Unauthorized' });
 
   const store = getPulseTapStore(event);
   const [subscriptions, savedSettings, savedState, savedContext, savedInbox] = await Promise.all([
@@ -450,5 +446,17 @@ exports.handler = async (event) => {
     });
     return jsonResponse(500, { error: failure.message });
   }
+};
+
+exports._test = {
+  getLocalParts,
+  getPushFailureDetails,
+  isQuietHour,
+  isScheduledInvocation,
+  normalizeContext,
+  normalizeSettings,
+  parseDecisionJson,
+  stripMarkdown,
+  truncateAtWordBoundary
 };
 
