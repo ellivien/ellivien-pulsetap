@@ -1,0 +1,3 @@
+[functions."pulsetap-scheduled"]
+  schedule = "*/30 * * * *"
+

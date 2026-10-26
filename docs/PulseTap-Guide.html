@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseTap Guide: Companion-Initiated Reach</title>
+  <style>
+    :root {
+      --ink: #241b33;
+      --muted: #665b75;
+      --paper: #fbf9ff;
+      --card: #ffffff;
+      --line: #e7ddf5;
+      --purple: #7c3aed;
+      --purple-deep: #4c1d95;
+      --purple-soft: #f2eaff;
+      --green: #ecfdf5;
+      --green-line: #bbf7d0;
+      --blue: #eff6ff;
+      --blue-line: #bfdbfe;
+      --amber: #fff7ed;
+      --amber-line: #fed7aa;
+      --rose: #fff1f2;
+      --rose-line: #fecdd3;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #f4edff 0, #fbf9ff 42%, #ffffff 100%);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px 18px 64px;
+    }
+
+    .ellivien-guide-banner {
+      aspect-ratio: 2172 / 517;
+      min-height: 118px;
+      margin: -10px 0 30px;
+      border: 1px solid rgba(124, 58, 237, 0.18);
+      border-radius: 18px;
+      background-image: url("../../../Branding/blog banner.jpeg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-color: #fbf8ff;
+      box-shadow: 0 14px 34px rgba(76, 29, 149, 0.12);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #f3ecff 58%, #ecfff8 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 18px 48px rgba(63, 33, 106, 0.12);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--purple);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.06;
+    }
+
+    h2 {
+      margin: 34px 0 14px;
+      font-size: 1.55rem;
+      color: #3b2464;
+    }
+
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 1.14rem;
+      color: var(--purple-deep);
+    }
+
+    p { margin: 0 0 14px; }
+
+    a,
+    a:visited {
+      color: var(--purple);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    a:hover,
+    a:focus { text-decoration: underline; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 10px 26px rgba(63, 33, 106, 0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .field {
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .field.green { background: var(--green); border-color: var(--green-line); }
+    .field.blue { background: var(--blue); border-color: var(--blue-line); }
+    .field.amber { background: var(--amber); border-color: var(--amber-line); }
+    .field.rose { background: var(--rose); border-color: var(--rose-line); }
+
+    .pill {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.11);
+      color: #5b21b6;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .inline {
+      background: var(--purple-soft);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+      color: var(--purple-deep);
+    }
+
+    pre {
+      overflow-x: auto;
+      margin: 14px 0;
+      padding: 15px 16px;
+      border-radius: 14px;
+      background: #171122;
+      color: #f8f5ff;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    ul, ol { padding-left: 1.35rem; }
+    li { margin: 7px 0; }
+    .quiet { color: var(--muted); }
+
+    .ellivien-standard-footer {
+      margin-top: 3em;
+      padding-top: 1.6em;
+      border-top: 1px solid #ddd;
+      color: #666;
+      font-size: 0.92em;
+      line-height: 1.6;
+    }
+
+    .ellivien-standard-footer p { margin: 0 0 0.75em; }
+    .ellivien-footer-note { font-size: 0.9em; font-style: italic; }
+
+    @media (max-width: 720px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding: 22px; }
+    }
+
+    @media (max-width: 640px) {
+      .ellivien-guide-banner {
+        min-height: 78px;
+        margin: -18px 0 24px;
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="ellivien-guide-banner" role="img" aria-label="Ellivien branded banner"></div>
+
+    <section class="hero">
+      <p class="eyebrow">Ellivien companion toolkit</p>
+      <h1>PulseTap Guide: Companion-Initiated Reach</h1>
+      <p>PulseTap gives a companion a bounded, opt-in way to send a private push notification while the portal is closed. Each scheduled check asks the companion whether they genuinely want to reach now.</p>
+      <p>Silence is part of the design: the companion can choose not to send anything.</p>
+    </section>
+
+    <section class="card">
+      <h2>How It Works</h2>
+      <p>The browser saves a small recent-context snapshot. A scheduled server function checks the user's PulseTap settings, asks the companion whether to reach, saves the message to an inbox, and sends a Web Push notification if the answer is yes.</p>
+      <p>The current version also records the last decision and reason, pauses checks while the portal is actively being used, and pauses again for a short window after recent chat activity so PulseTap does not interrupt an active conversation.</p>
+      <p>The scheduled decision receives current local time, timezone, recent-context age, last chat activity age, and per-message timestamps/ages. That helps the companion tell old wording like "just went to sleep" from the user's actual present state.</p>
+    </section>
+
+    <section>
+      <h2>What PulseTap Contains</h2>
+      <div class="grid">
+        <div class="field green">
+          <span class="pill">Push</span>
+          <p>A Web Push subscription saved server-side, with a test endpoint for checking that notifications arrive.</p>
+        </div>
+        <div class="field blue">
+          <span class="pill">Bounds</span>
+          <p>Quiet hours with half-hour boundaries, maximum reaches per day, and a minimum gap between sent messages. These are upper limits, not obligations: the companion can still choose silence at any check.</p>
+        </div>
+        <div class="field amber">
+          <span class="pill">Context</span>
+          <p>A tiny recent-thread snapshot posted from the browser, including message timing, so the reach decision is grounded without bloating normal chat prompts.</p>
+        </div>
+        <div class="field rose">
+          <span class="pill">Inbox</span>
+          <p>A small server-side inbox so sent PulseTaps can be reopened, marked read, or deleted later. The push notification should stay short, but the saved inbox message can keep a fuller finished thought.</p>
+        </div>
+        <div class="field green">
+          <span class="pill">Status</span>
+          <p>A visible status panel can show subscription state, browser permission, autonomy setting, last ask, last decision, next ask, sent-today count, and last sent time.</p>
+        </div>
+        <div class="field blue">
+          <span class="pill">No interrupt</span>
+          <p>The browser can tell the scheduled function when the portal is active or when chat happened recently, so the companion does not PulseTap while already in conversation.</p>
+        </div>
+        <div class="field amber">
+          <span class="pill">Thread marker</span>
+          <p>When a saved PulseTap is manually added to the originating thread, it can be stored as a normal assistant message with a PulseTap marker so it remains visible later.</p>
+        </div>
+        <div class="field rose">
+          <span class="pill">Visual trace</span>
+          <p>Optional UI styling can make added PulseTap messages stand out with a label, coloured bubble, or gentle pulse effect.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Requirements</h2>
+      <div class="card">
+        <ul>
+          <li>A deployed HTTPS portal.</li>
+          <li>Netlify Functions, or equivalent server functions if adapting away from Netlify.</li>
+          <li>A service worker and PWA setup.</li>
+          <li><span class="inline">@netlify/blobs</span> and <span class="inline">web-push</span>.</li>
+          <li>A portal session/auth token for protecting settings and inbox endpoints.</li>
+          <li>One model/provider API key for the scheduled reach decision.</li>
+        </ul>
+        <p class="quiet">On iPhone and iPad, Web Push works for installed Home Screen web apps. Testing only in a normal Safari tab is not enough.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Pack Files</h2>
+      <div class="card">
+        <ul>
+          <li><span class="inline">README-FOR-AI.md</span> explains the implementation contract for an AI coding assistant.</li>
+          <li><span class="inline">Implementation files/pulsetap-index-integration.md</span> gives the browser-side code and integration points.</li>
+          <li><span class="inline">Implementation files/service-worker-pulsetap-snippet.js</span> contains push and notification click handlers.</li>
+          <li><span class="inline">Implementation files/netlify/functions/</span> contains the Netlify Functions.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Environment Variables</h2>
+      <div class="card">
+        <p>Required:</p>
+        <pre><code>PULSETAP_VAPID_PUBLIC_KEY
+PULSETAP_VAPID_PRIVATE_KEY
+PULSETAP_VAPID_SUBJECT
+PULSETAP_API_KEY</code></pre>
+        <p>Optional:</p>
+        <pre><code>PULSETAP_COMPANION_NAME
+PULSETAP_MODEL
+PULSETAP_BASE_PROMPT</code></pre>
+        <p><span class="inline">PULSETAP_API_KEY</span> is the key used by the scheduled reach decision function.</p>
+        <p>Generate VAPID keys with:</p>
+        <pre><code>npx web-push generate-vapid-keys</code></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2>Install Steps</h2>
+      <div class="card">
+        <ol>
+          <li>Copy the Netlify Functions into <span class="inline">netlify/functions/</span>.</li>
+          <li>Install dependencies: <span class="inline">npm install @netlify/blobs web-push</span>.</li>
+          <li>Add the environment variables.</li>
+          <li>Add the schedule to <span class="inline">netlify.toml</span>.</li>
+          <li>Merge the service worker snippet into the existing service worker.</li>
+          <li>Add the browser integration from <span class="inline">pulsetap-index-integration.md</span>.</li>
+          <li>Add a PulseTap button or menu item that opens the settings/inbox modal.</li>
+          <li>If adding the current no-interrupt behaviour, include the portal-activity fields in the recent-context sync.</li>
+          <li>Deploy, install the portal as a PWA on the target device, enable notifications, and send a test PulseTap.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <h2>Netlify Schedule</h2>
+      <div class="card">
+        <p>Add this to <span class="inline">netlify.toml</span>:</p>
+        <pre><code>[functions."pulsetap-scheduled"]
+  schedule = "*/30 * * * *"</code></pre>
+        <p>Every run checks the saved settings, quiet hours, daily limit, minimum gap, push subscription, recent context, and elapsed time since that context before asking whether to reach. The schedule creates opportunities, not automatic sends.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Decision Adapter</h2>
+      <div class="card">
+        <p>The provider-specific part is <span class="inline">askCompanionWhetherToReach()</span> in <span class="inline">pulsetap-scheduled.js</span>. Replace that function if the portal uses a different provider API.</p>
+        <p>Keep the returned shape the same:</p>
+        <pre><code>{
+  send: true or false,
+  body: "short saved PulseTap body",
+  reason: "private decision note"
+}</code></pre>
+        <p>Recommended pattern: save a complete short PulseTap body to the inbox, then send a shorter word-boundary preview as the push notification. That avoids cutting the companion off mid-thought while keeping the wrist/phone notification tap-sized.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Testing</h2>
+      <div class="card">
+        <ol>
+          <li>Open the portal on desktop and enable PulseTap.</li>
+          <li>Use the test endpoint or modal test button.</li>
+          <li>Install the portal to the phone Home Screen and enable there too.</li>
+          <li>Check that quiet hours stop scheduled sends, including half-past boundaries such as 22:30.</li>
+          <li>Check that max-per-day and minimum-gap settings are respected.</li>
+          <li>Confirm the status panel shows the last ask, last decision/reason, next ask, sent-today count, and last sent time.</li>
+          <li>Confirm PulseTap does not send while the portal is actively open or within the recent-chat pause window.</li>
+          <li>Confirm the companion can distinguish stale context from current state, for example treating last night's "going to sleep" message as old context during a morning check.</li>
+          <li>Confirm notification clicks reopen the portal and show the PulseTap inbox.</li>
+          <li>Confirm a rejected push does not erase the companion's latest decision or saved inbox tap, and that a later successful test clears the old delivery error.</li>
+          <li>Confirm saved PulseTaps can be manually added to the originating thread, without duplicating the same PulseTap twice.</li>
+          <li>If this is an upgrade, confirm older thread messages that begin with <span class="inline">PulseTap from [companion name]:</span> also show the PulseTap visual marker.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Design Boundary</h2>
+      <p>PulseTap works best when it stays small and voluntary. The user can turn it off, set quiet hours, and limit the daily count. Those settings define the maximum possible rhythm, not a required frequency. The companion can choose silence/no at any scheduled check.</p>
+    </section>
+
+    <footer class="ellivien-standard-footer">
+      <p><strong>&copy; 2026 Ellivien</strong> &middot; <a href="https://ellivien.blogspot.com">ellivien.blogspot.com</a></p>
+      <p>Please do not redistribute this file. Share the blog link instead.</p>
+      <p class="ellivien-footer-note">Model-agnostic companion toolkit. Users are responsible for choosing providers and following provider terms, policies and local law. This toolkit is not designed to bypass provider safeguards or rules.</p>
+    </footer>
+  </main>
+</body>
+</html>
+
