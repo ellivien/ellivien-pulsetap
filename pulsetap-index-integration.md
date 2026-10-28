@@ -306,12 +306,15 @@ thread.messages.push({
 
 Before adding it, check whether the thread already contains that `pulseTapId`. This prevents duplicate copies if the user opens the inbox twice.
 
-If the portal has message rendering badges, use `pulseTapId` to show a small `PulseTap` marker, coloured message bubble, or gentle pulse effect. This is visual only; it should not change the stored message content or cause an extra model call.
+Use the supplied renderer below to place a small teal waveform pill immediately
+after the message bubble. This is visual provenance only: it does not change the
+stored message content or cause an extra model call.
 
 If the portal supports dark mode, do not let the PulseTap bubble inherit the normal dark-mode assistant text colour when the PulseTap bubble uses a pale gradient. Give the PulseTap bubble an explicit readable text colour:
 
 ```css
-.message.assistant.pulse-tap-message {
+.message.assistant.pulse-tap-message,
+.pulse-tap-message {
   background: linear-gradient(135deg, #ecfeff 0%, #fdf2f8 100%);
   border: 1px solid rgba(20, 184, 166, 0.38);
   border-left: 4px solid #14b8a6;
@@ -323,9 +326,43 @@ If the portal supports dark mode, do not let the PulseTap bubble inherit the nor
 }
 
 .pulse-tap-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  width: max-content;
+  margin: 7px 0 10px 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
   background: rgba(20, 184, 166, 0.14);
   border: 1px solid rgba(20, 184, 166, 0.28);
   color: #0f766e;
+  font: 700 0.86rem/1 system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.pulse-tap-badge__wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 14px;
+}
+
+.pulse-tap-badge__wave i {
+  display: block;
+  width: 2px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.pulse-tap-badge__wave i:nth-child(2),
+.pulse-tap-badge__wave i:nth-child(4) {
+  height: 10px;
+}
+
+.pulse-tap-badge__wave i:nth-child(3) {
+  height: 14px;
 }
 ```
 
@@ -339,15 +376,61 @@ function isPulseTapThreadMessage(role, content, pulseTapId = null, companionName
 }
 ```
 
-Use that helper, or the portal's equivalent, before adding the visual class or badge:
+Add this ready-to-use marker helper beside the portal's message renderer:
 
 ```js
-const isPulseTap = isPulseTapThreadMessage(message.role, message.content, message.pulseTapId, companionName);
-if (isPulseTap) {
+function addPulseTapMarker(messageElement, message, options = {}) {
+  const companionName = options.companionName || 'Companion';
+  const isPulseTap = isPulseTapThreadMessage(
+    message.role,
+    message.content,
+    message.pulseTapId,
+    companionName
+  );
+  if (!isPulseTap) return null;
+
   messageElement.classList.add('pulse-tap-message');
-  if (message.pulseTapId) messageElement.dataset.pulseTapId = message.pulseTapId;
+  if (message.pulseTapId) {
+    messageElement.dataset.pulseTapId = message.pulseTapId;
+  }
+
+  const existingBadge = messageElement.nextElementSibling;
+  if (existingBadge?.classList.contains('pulse-tap-badge')) {
+    return existingBadge;
+  }
+
+  const badge = document.createElement('span');
+  badge.className = 'pulse-tap-badge';
+  badge.setAttribute('role', 'note');
+  badge.setAttribute('aria-label', 'PulseTap message');
+
+  const wave = document.createElement('span');
+  wave.className = 'pulse-tap-badge__wave';
+  wave.setAttribute('aria-hidden', 'true');
+  for (let bar = 0; bar < 5; bar += 1) {
+    wave.appendChild(document.createElement('i'));
+  }
+
+  const label = document.createElement('span');
+  label.textContent = options.label || 'PulseTap';
+  badge.append(wave, label);
+  messageElement.insertAdjacentElement('afterend', badge);
+  return badge;
 }
 ```
+
+Pass the complete stored message into the renderer, then call the helper after
+the message bubble has been added to the DOM:
+
+```js
+function renderStoredMessage(message) {
+  const messageElement = renderNormalMessageBubble(message);
+  addPulseTapMarker(messageElement, message, { companionName });
+}
+```
+
+Do not reduce the renderer call to only `role` and `content`: it must retain
+`pulseTapId` so the visible provenance marker survives reloads.
 
 Do not inject PulseTap status into every normal chat prompt. The scheduled function handles the private reach/no-reach decision separately.
 

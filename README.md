@@ -22,6 +22,7 @@ recent-conversation pause constrain every check.
 - a human-facing installation guide
 - optional relationship and message-mode examples
 - an optional Ellivien PulseTap notification icon
+- a ready-to-use in-thread PulseTap pill and message-bubble treatment
 - visible decision state and an inbox so the process is inspectable
 
 The supplied scheduled function uses an OpenAI-compatible Chat Completions
@@ -51,6 +52,7 @@ individual installation or ongoing technical support for the public repository.
 - Expired Web Push subscriptions are removed after HTTP 404 or 410
 - Notifications are saved to the inbox before delivery
 - Full decision state remains visible to the user
+- PulseTaps copied into a conversation retain a visible provenance pill
 
 ## Start here
 

@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 
 const common = require('../netlify/functions/pulsetap-common.cjs');
 const scheduled = require('../netlify/functions/pulsetap-scheduled.js');
@@ -111,4 +112,76 @@ test('browser guidance never manufactures current chat timestamps', () => {
   assert.doesNotMatch(guide, /lastPulseTapChatActivityAt\s*\|\|\s*now/);
   assert.doesNotMatch(guide, /message\.createdAt\s*\|\|\s*Date\.now/);
   assert.match(guide, /lastChatActivityAt:\s*lastPulseTapChatActivityAt\s*\|\|\s*null/);
+});
+
+test('browser integration supplies a real in-thread PulseTap pill renderer', () => {
+  const guide = fs.readFileSync(path.join(__dirname, '../pulsetap-index-integration.md'), 'utf8');
+  assert.match(guide, /function addPulseTapMarker\(messageElement, message, options = \{\}\)/);
+  assert.match(guide, /badge\.className = 'pulse-tap-badge'/);
+  assert.match(guide, /badge\.setAttribute\('aria-label', 'PulseTap message'\)/);
+  assert.match(guide, /wave\.appendChild\(document\.createElement\('i'\)\)/);
+  assert.match(guide, /messageElement\.insertAdjacentElement\('afterend', badge\)/);
+  assert.match(guide, /addPulseTapMarker\(messageElement, message, \{ companionName \}\)/);
+  assert.match(guide, /must retain\s+`pulseTapId`/);
+
+  const fencedFunction = name => {
+    const start = guide.indexOf(`function ${name}`);
+    const end = guide.indexOf('\n```', start);
+    assert.notEqual(start, -1, `${name} must be present in the browser integration`);
+    assert.notEqual(end, -1, `${name} must remain inside an executable code block`);
+    return guide.slice(start, end);
+  };
+  const createElement = tagName => {
+    const classes = new Set();
+    const element = {
+      tagName,
+      children: [],
+      attributes: {},
+      dataset: {},
+      nextElementSibling: null,
+      classList: {
+        add: value => classes.add(value),
+        contains: value => classes.has(value)
+      },
+      setAttribute(name, value) { this.attributes[name] = value; },
+      append(...children) { this.children.push(...children); },
+      appendChild(child) { this.children.push(child); return child; },
+      insertAdjacentElement(position, child) {
+        assert.equal(position, 'afterend');
+        this.nextElementSibling = child;
+        return child;
+      }
+    };
+    Object.defineProperty(element, 'className', {
+      get: () => [...classes].join(' '),
+      set: value => String(value).split(/\s+/).filter(Boolean).forEach(item => classes.add(item))
+    });
+    return element;
+  };
+  const sandbox = { document: { createElement } };
+  vm.runInNewContext(
+    `${fencedFunction('isPulseTapThreadMessage')}\n${fencedFunction('addPulseTapMarker')}\nthis.addPulseTapMarker = addPulseTapMarker;`,
+    sandbox
+  );
+
+  const bubble = createElement('article');
+  const message = { role: 'assistant', content: 'A saved thought.', pulseTapId: 'tap-1' };
+  const badge = sandbox.addPulseTapMarker(bubble, message, { companionName: 'Companion' });
+  assert.equal(bubble.classList.contains('pulse-tap-message'), true);
+  assert.equal(bubble.dataset.pulseTapId, 'tap-1');
+  assert.equal(badge.attributes['aria-label'], 'PulseTap message');
+  assert.equal(badge.children[0].children.length, 5);
+  assert.equal(badge.children[1].textContent, 'PulseTap');
+  assert.equal(sandbox.addPulseTapMarker(bubble, message), badge, 'the marker must not duplicate');
+
+  const legacyBubble = createElement('article');
+  const legacy = sandbox.addPulseTapMarker(legacyBubble, {
+    role: 'assistant',
+    content: 'PulseTap from Companion: An older saved thought.'
+  });
+  assert.equal(legacy?.classList.contains('pulse-tap-badge'), true);
+  assert.equal(sandbox.addPulseTapMarker(createElement('article'), {
+    role: 'assistant',
+    content: 'An ordinary assistant message.'
+  }), null);
 });

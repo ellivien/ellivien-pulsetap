@@ -144,7 +144,7 @@ the Scheduled Function configuration when adapting or deploying it.
 - If the browser sends `lastChatActivityAt` and `recentChatWindowMs`, do not run the model during that recent-chat pause window.
 - Do not skip a scheduled check merely because the portal was recently opened, focused, or tapped. Generic portal activity can become stale on PWAs; only real recent chat activity should pause PulseTap.
 - When adding an inbox PulseTap into a thread, store the PulseTap id on the message and prevent duplicates.
-- If the portal has message badges or styled bubbles, mark added PulseTap messages visually so they remain recognisable inside the thread.
+- Install and call `addPulseTapMarker()` from the browser integration when rendering each message so added PulseTaps receive the supplied visible pill and bubble treatment.
 - If the portal already has thread messages copied from PulseTap before this marker existed, add a render fallback for assistant messages beginning with `PulseTap from <companion name>:` so legacy thread copies are highlighted too.
 - Copy the bundled PulseTap icon to the host portal's public assets or deliberately replace the default icon path with the adopter's own artwork.
 - Do not require strong-consistency Blob reads unless the deployed environment demonstrably supplies the uncached endpoint they require. Standard reads are the portable default. If immediate read-after-update behaviour is essential, implement and test an explicit freshness strategy for that host.
@@ -166,7 +166,7 @@ the Scheduled Function configuration when adapting or deploying it.
 13. Confirm the modal/status panel shows last ask, last decision/reason, next ask, sent-today count and last sent time.
 14. Confirm PulseTap stays silent during the recent-chat pause window. Merely
     opening or focusing the portal must not manufacture chat activity.
-15. Confirm a saved PulseTap can be added to the matching thread once, with duplicate protection and a visible PulseTap marker if the portal supports one.
+15. Confirm a saved PulseTap can be added to the matching thread once, with duplicate protection and the supplied visible PulseTap pill.
 16. If upgrading an existing portal, confirm any older thread message beginning with `PulseTap from <companion name>:` also renders with the PulseTap visual marker.
 17. Simulate or observe a failed push and confirm the new tap and latest decision remain saved; then send a successful test and confirm the old error clears.
 
