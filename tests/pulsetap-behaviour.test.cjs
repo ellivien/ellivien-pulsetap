@@ -117,9 +117,24 @@ test('browser guidance never manufactures current chat timestamps', () => {
 test('browser integration supplies a real in-thread PulseTap pill renderer', () => {
   const guide = fs.readFileSync(path.join(__dirname, '../pulsetap-index-integration.md'), 'utf8');
   assert.match(guide, /function addPulseTapMarker\(messageElement, message, options = \{\}\)/);
+  assert.match(guide, /function getPulseTapBadgeSvg\(\)/);
   assert.match(guide, /badge\.className = 'pulse-tap-badge'/);
   assert.match(guide, /badge\.setAttribute\('aria-label', 'PulseTap message'\)/);
-  assert.match(guide, /wave\.appendChild\(document\.createElement\('i'\)\)/);
+  assert.match(guide, /badge\.innerHTML = getPulseTapBadgeSvg\(\)/);
+  assert.match(guide, /d="M12 5\.5v13"/);
+  assert.match(guide, /d="M7\.5 9\.5v5"/);
+  assert.match(guide, /d="M16\.5 9\.5v5"/);
+  assert.match(guide, /d="M4 11\.25v1\.5"/);
+  assert.match(guide, /d="M20 11\.25v1\.5"/);
+  assert.match(guide, /gap: 5px/);
+  assert.match(guide, /padding: 6px 10px/);
+  assert.match(guide, /font-size: 11px/);
+  assert.match(guide, /font-weight: 600/);
+  assert.match(guide, /letter-spacing: 0\.02em/);
+  assert.match(guide, /background: rgba\(20, 184, 166, 0\.1\)/);
+  assert.match(guide, /border: 1px solid rgba\(20, 184, 166, 0\.2\)/);
+  assert.match(guide, /\.pulse-tap-badge svg \{[\s\S]*?width: 13px;[\s\S]*?height: 13px;/);
+  assert.doesNotMatch(guide, /pulse-tap-badge__wave/);
   assert.match(guide, /messageElement\.insertAdjacentElement\('afterend', badge\)/);
   assert.match(guide, /addPulseTapMarker\(messageElement, message, \{ companionName \}\)/);
   assert.match(guide, /must retain\s+`pulseTapId`/);
@@ -160,7 +175,7 @@ test('browser integration supplies a real in-thread PulseTap pill renderer', () 
   };
   const sandbox = { document: { createElement } };
   vm.runInNewContext(
-    `${fencedFunction('isPulseTapThreadMessage')}\n${fencedFunction('addPulseTapMarker')}\nthis.addPulseTapMarker = addPulseTapMarker;`,
+    `${fencedFunction('isPulseTapThreadMessage')}\n${fencedFunction('getPulseTapBadgeSvg')}\n${fencedFunction('addPulseTapMarker')}\nthis.addPulseTapMarker = addPulseTapMarker;`,
     sandbox
   );
 
@@ -170,8 +185,9 @@ test('browser integration supplies a real in-thread PulseTap pill renderer', () 
   assert.equal(bubble.classList.contains('pulse-tap-message'), true);
   assert.equal(bubble.dataset.pulseTapId, 'tap-1');
   assert.equal(badge.attributes['aria-label'], 'PulseTap message');
-  assert.equal(badge.children[0].children.length, 5);
-  assert.equal(badge.children[1].textContent, 'PulseTap');
+  assert.match(badge.innerHTML, /^<svg viewBox="0 0 24 24"/);
+  assert.equal((badge.innerHTML.match(/<path /g) || []).length, 5);
+  assert.equal(badge.children[0].textContent, 'PulseTap');
   assert.equal(sandbox.addPulseTapMarker(bubble, message), badge, 'the marker must not duplicate');
 
   const legacyBubble = createElement('article');

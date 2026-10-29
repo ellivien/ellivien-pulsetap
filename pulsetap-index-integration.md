@@ -329,40 +329,24 @@ If the portal supports dark mode, do not let the PulseTap bubble inherit the nor
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  gap: 8px;
+  gap: 5px;
   width: max-content;
   margin: 7px 0 10px 14px;
-  padding: 7px 14px;
+  padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(20, 184, 166, 0.14);
-  border: 1px solid rgba(20, 184, 166, 0.28);
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.2);
   color: #0f766e;
-  font: 700 0.86rem/1 system-ui, sans-serif;
-  letter-spacing: 0.01em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
-.pulse-tap-badge__wave {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  height: 14px;
-}
-
-.pulse-tap-badge__wave i {
+.pulse-tap-badge svg {
   display: block;
-  width: 2px;
-  height: 6px;
-  border-radius: 999px;
-  background: currentColor;
-}
-
-.pulse-tap-badge__wave i:nth-child(2),
-.pulse-tap-badge__wave i:nth-child(4) {
-  height: 10px;
-}
-
-.pulse-tap-badge__wave i:nth-child(3) {
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 ```
 
@@ -379,6 +363,10 @@ function isPulseTapThreadMessage(role, content, pulseTapId = null, companionName
 Add this ready-to-use marker helper beside the portal's message renderer:
 
 ```js
+function getPulseTapBadgeSvg() {
+  return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5.5v13" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M7.5 9.5v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M16.5 9.5v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M4 11.25v1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M20 11.25v1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>`;
+}
+
 function addPulseTapMarker(messageElement, message, options = {}) {
   const companionName = options.companionName || 'Companion';
   const isPulseTap = isPulseTapThreadMessage(
@@ -403,17 +391,11 @@ function addPulseTapMarker(messageElement, message, options = {}) {
   badge.className = 'pulse-tap-badge';
   badge.setAttribute('role', 'note');
   badge.setAttribute('aria-label', 'PulseTap message');
-
-  const wave = document.createElement('span');
-  wave.className = 'pulse-tap-badge__wave';
-  wave.setAttribute('aria-hidden', 'true');
-  for (let bar = 0; bar < 5; bar += 1) {
-    wave.appendChild(document.createElement('i'));
-  }
+  badge.innerHTML = getPulseTapBadgeSvg();
 
   const label = document.createElement('span');
   label.textContent = options.label || 'PulseTap';
-  badge.append(wave, label);
+  badge.appendChild(label);
   messageElement.insertAdjacentElement('afterend', badge);
   return badge;
 }
