@@ -18,10 +18,12 @@ Each snapshot keeps both the per-asset counts and a
 `releaseAssetDownloadTotal` includes checksum-file downloads and must not be
 described as package downloads.
 
-GitHub exposes repository traffic for only the latest 14 days. The workflow
-runs automatically every Sunday at 08:17 UTC so its overlapping snapshots preserve that
-otherwise temporary history. The JSON files contain aggregate counts only and
-do not identify visitors.
+GitHub exposes repository traffic for only the latest 14 days. Automatic
+account-wide preservation now lives in
+[`ellivien-open-source-evidence`](https://github.com/ellivien/ellivien-open-source-evidence),
+which discovers current and future public repositories every Sunday. This
+repository's original collector remains available as a manual fallback only.
+The JSON files contain aggregate counts and do not identify visitors.
 
 ## One-time setup before publication
 

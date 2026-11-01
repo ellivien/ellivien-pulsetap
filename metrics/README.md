@@ -1,7 +1,8 @@
 # Preserved GitHub metrics
 
-After publication, the scheduled workflow writes timestamped aggregate GitHub
-traffic snapshots into `snapshots/` every Sunday at 08:17 UTC.
+The original repository-specific workflow can write manual aggregate GitHub
+traffic snapshots into `snapshots/`. Automatic weekly evidence is now
+preserved centrally by `ellivien-open-source-evidence` for every public repo.
 
 These files intentionally contain no visitor identities, cookies, IP addresses
 or PulseTap installation telemetry. See
