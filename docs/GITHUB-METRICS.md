@@ -19,7 +19,7 @@ Each snapshot keeps both the per-asset counts and a
 described as package downloads.
 
 GitHub exposes repository traffic for only the latest 14 days. The workflow
-runs every Monday and Thursday so its overlapping snapshots preserve that
+runs automatically every Sunday at 08:17 UTC so its overlapping snapshots preserve that
 otherwise temporary history. The JSON files contain aggregate counts only and
 do not identify visitors.
 

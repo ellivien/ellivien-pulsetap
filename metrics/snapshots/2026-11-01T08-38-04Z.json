@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-11-01T08:38:04.084Z",
+  "repository": "ellivien/ellivien-pulsetap",
+  "source": {
+    "provider": "GitHub REST API",
+    "aggregateOnly": true,
+    "trafficWindowDays": 14,
+    "note": "GitHub traffic is a rolling 14-day window. Overlapping snapshots preserve the history without identifying visitors."
+  },
+  "repositoryTotals": {
+    "stars": 0,
+    "forks": 0,
+    "openIssuesAndPullRequests": 0
+  },
+  "traffic": {
+    "views": {
+      "count": 6,
+      "uniques": 4,
+      "views": [
+        {
+          "timestamp": "2026-10-18T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-19T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-20T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-21T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-22T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-23T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-24T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-25T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-26T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-27T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-28T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-29T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-30T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-31T00:00:00Z",
+          "count": 6,
+          "uniques": 4
+        }
+      ]
+    },
+    "clones": {
+      "count": 5,
+      "uniques": 5,
+      "clones": [
+        {
+          "timestamp": "2026-10-18T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-19T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-20T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-21T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-22T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-23T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-24T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-25T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-26T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-27T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-28T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-29T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-30T00:00:00Z",
+          "count": 0,
+          "uniques": 0
+        },
+        {
+          "timestamp": "2026-10-31T00:00:00Z",
+          "count": 5,
+          "uniques": 5
+        }
+      ]
+    },
+    "topReferrers": [],
+    "popularPaths": [
+      {
+        "path": "/ellivien/ellivien-pulsetap",
+        "title": "Overview",
+        "count": 6,
+        "uniques": 4
+      }
+    ]
+  },
+  "releases": [
+    {
+      "tagName": "v0.1.0",
+      "name": "Ellivien PulseTap v0.1.0",
+      "draft": false,
+      "prerelease": false,
+      "publishedAt": "2026-10-31T07:26:10Z",
+      "url": "https://github.com/ellivien/ellivien-pulsetap/releases/tag/v0.1.0",
+      "assets": [
+        {
+          "name": "ellivien-pulsetap-v0.1.0.zip",
+          "size": 1742700,
+          "contentType": "application/zip",
+          "downloadCount": 1,
+          "updatedAt": "2026-10-31T07:26:10Z",
+          "downloadUrl": "https://github.com/ellivien/ellivien-pulsetap/releases/download/v0.1.0/ellivien-pulsetap-v0.1.0.zip"
+        },
+        {
+          "name": "ellivien-pulsetap-v0.1.0.zip.sha256",
+          "size": 95,
+          "contentType": "application/octet-stream",
+          "downloadCount": 1,
+          "updatedAt": "2026-10-31T07:26:09Z",
+          "downloadUrl": "https://github.com/ellivien/ellivien-pulsetap/releases/download/v0.1.0/ellivien-pulsetap-v0.1.0.zip.sha256"
+        }
+      ]
+    }
+  ],
+  "releaseAssetDownloadTotal": 2,
+  "releasePackageDownloadTotal": 1
+}
